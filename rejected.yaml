@@ -1,0 +1,95 @@
+%YAML 1.2
+---
+Logging:
+    directory: logs
+    filename: log.txt
+    format: "%(levelname) -10s %(asctime)s %(message)s"
+    # Valid values: debug, info, warning, error, critical
+    level: error
+    #handler: syslog
+
+LogEvents:
+    
+Monitor:
+    enabled: False
+    # Number of seconds to poll at
+    interval: 30
+
+Connections:
+    localhost:
+        host: 127.0.0.1
+        port: 5672
+        user: guest
+        pass: guest
+        ssl: False
+        vhost: /
+        monitor_port: 9999
+Exchanges:
+    UnifiedLog:
+        auto_delete: False
+        durable: False
+        type: direct
+Queues:
+    UnifiedLogQueue:
+        auto_delete: False
+        durable: False
+        exclusive: False
+Bindings:
+    UnifiedLog.UnifiedLogQueue:
+        import: processors.unified_log_processor
+        processor: unified_log_processor 
+        connections: [localhost]
+        exchange: UnifiedLog
+        queue: UnifiedLogQueue
+        compressed: False
+        mssqlserver: DBDEV
+        mssqluser: test
+        mssqlpassword: test
+        mssqldatabase: DB_LOG
+        consumers:
+            # Auto-Ack Messages?
+            auto_ack: True
+            # Minimum number of consumers for this binding per connection
+            min: 2
+            # Maximum number of consumers for this binding per connection
+            max: 4
+            # Max number of errors before shutting down the consumer as a safety catch
+            max_errors: 5
+            # When encountering an error, put it in an error_queue?
+            use_error_queue: True
+            error_queue: UnifiedLogErrorQueue
+            # When encountering an error, put it back in the queue? (probably shouldnt have this set to True if use_error_queue = True)
+            requeue_on_error: False
+            # Number of pending messages before spawning 1 additional consumer up to max
+            threshold: 100
+            # Number of messages per second to throttle to *per consumer thread*
+            throttle: 1000
+   UnifiedLog.UnifiedLogErrorQueue:
+        import: processors.unified_log_processor
+        processor: unified_log_processor 
+        connections: [localhost]
+        exchange: UnifiedLog
+        queue: UnifiedLogErrorQueue
+        compressed: False
+        mssqlserver: DSDEV
+        mssqluser: test
+        mssqlpassword: test
+        mssqldatabase: DB_LOG
+        consumers:
+            # Auto-Ack Messages?
+            auto_ack: True
+            # Minimum number of consumers for this binding per connection
+            min: 0
+            # Maximum number of consumers for this binding per connection
+            max: 0
+            # Max number of errors before shutting down the consumer as a safety catch
+            max_errors: 5
+            # When encountering an error, put it in an error_queue?
+            use_error_queue: True
+            error_queue: UnifiedLogErrorQueue
+            # When encountering an error, put it back in the queue? (probably shouldnt have this set to True if use_error_queue = True)
+            requeue_on_error: False
+            # Number of pending messages before spawning 1 additional consumer up to max
+            threshold: 100
+            # Number of messages per second to throttle to *per consumer thread*
+            throttle: 1000

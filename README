@@ -1,0 +1,20 @@
+rejected.py is a multi-threaded AMQP 0-8 consumer framework. It has been developed for and tested against RabbitMQ 1.6.0 and greater. For more information, check out the wiki on the main GitHub page: http://github.com/gmr/rejected.py
+
+This fork process messages in the queue and can send them to a MSSQL table.
+
+Features Include:
+
+ * Optional elastic scaling of consumers based upon demand
+  * Specify a min # of consumers, max # of consumers and threshold to spawn new threads
+ * Throttling of messages per second
+ * Allows for multiple brokers per binding
+ * Multiple bindings per instance
+
+Requirements:
+
+ * amqplib
+ * pyyaml
+ * alice (optional)
+ * pymssql
+
+https://github.com/hex1848/rejected_MSSQL
